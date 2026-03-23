@@ -17,18 +17,18 @@
 
 ## 配置
 
+只需配置账号密码，Jira/Confluence 地址会从你提供的链接中自动提取。
+
 在 `.zshrc` 中 export 或项目根目录 `.env.local` 中配置：
 
 ```bash
 # Jira
 JIRA_USER=your_username
 JIRA_PASS=your_password
-JIRA_BASE_URL=http://your-jira-host:port
 
 # Confluence
 CONFLUENCE_USER=your_username
 CONFLUENCE_PASS=your_password
-CONFLUENCE_BASE_URL=http://your-confluence-host:port
 ```
 
 ## 使用示例

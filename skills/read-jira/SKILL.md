@@ -17,7 +17,9 @@ description: Use when user provides a Jira link or issue key (e.g. H5-XXXXX) and
 
 ## Prerequisites
 
-凭证和 Jira 地址通过环境变量提供，支持以下方式（按优先级）：
+只需配置账号密码，不需要配置 Jira 地址（从用户提供的链接中自动提取）。
+
+支持以下方式（按优先级）：
 
 1. **Shell 环境变量**（如在 `.zshrc` 中 export）
 2. **`.env.local` 文件**（项目根目录）
@@ -25,33 +27,38 @@ description: Use when user provides a Jira link or issue key (e.g. H5-XXXXX) and
 ```
 JIRA_USER=your_username
 JIRA_PASS=your_password
-JIRA_BASE_URL=http://your-jira-host:port
 ```
 
 ## Workflow
 
-### Step 1: Extract Issue Key
+### Step 1: Extract Issue Key and Base URL
 
-从用户输入中提取 issue key：
+从用户输入中提取 issue key 和 base URL：
 
-- URL: `http://your-jira-host/browse/H5-13209` → `H5-13209`
-- 直接提供: `H5-13209`
+- URL: `http://jira.example.com:8080/browse/H5-13209`
+  - base URL → `http://jira.example.com:8080`
+  - issue key → `H5-13209`
+- 直接提供 issue key（如 `H5-13209`）：需要用户补充完整链接，或使用上次使用过的 base URL
+
+提取 base URL 的方式：取 `/browse/` 之前的部分作为 base URL。
 
 ### Step 2: Load Credentials
 
 优先使用 shell 环境变量，若未设置则从 `.env.local` 加载：
 
 ```bash
-if [ -z "$JIRA_USER" ] || [ -z "$JIRA_PASS" ] || [ -z "$JIRA_BASE_URL" ]; then
+if [ -z "$JIRA_USER" ] || [ -z "$JIRA_PASS" ]; then
   set -a && source .env.local 2>/dev/null && set +a
 fi
 ```
 
 ### Step 3: Fetch Issue
 
+用从链接中提取的 base URL 拼接 API 地址：
+
 ```bash
 curl -s -u "$JIRA_USER:$JIRA_PASS" \
-  "$JIRA_BASE_URL/rest/api/2/issue/{issueKey}?fields=summary,status,assignee,reporter,description,comment,priority,issuetype,created,updated,labels,attachment" \
+  "{baseUrl}/rest/api/2/issue/{issueKey}?fields=summary,status,assignee,reporter,description,comment,priority,issuetype,created,updated,labels,attachment" \
   | python3 -c "
 import sys,json
 d=json.load(sys.stdin)

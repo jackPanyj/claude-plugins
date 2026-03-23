@@ -16,7 +16,9 @@ description: Use when user provides a Confluence link and wants to read API docs
 
 ## Prerequisites
 
-凭证和 Confluence 地址通过环境变量提供，支持以下方式（按优先级）：
+只需配置账号密码，不需要配置 Confluence 地址（从用户提供的链接中自动提取）。
+
+支持以下方式（按优先级）：
 
 1. **Shell 环境变量**（如在 `.zshrc` 中 export）
 2. **`.env.local` 文件**（项目根目录）
@@ -24,32 +26,37 @@ description: Use when user provides a Confluence link and wants to read API docs
 ```
 CONFLUENCE_USER=your_username
 CONFLUENCE_PASS=your_password
-CONFLUENCE_BASE_URL=http://your-confluence-host:port
 ```
 
 ## Workflow
 
-### Step 1: Extract Page ID
+### Step 1: Extract Page ID and Base URL
 
-从 URL 中提取 `pageId`：
+从用户提供的 URL 中提取 pageId 和 base URL：
 
-- `http://your-confluence-host/pages/viewpage.action?pageId=75268574` → `75268574`
+- URL: `http://confluence.example.com:8090/pages/viewpage.action?pageId=75268574`
+  - base URL → `http://confluence.example.com:8090`
+  - pageId → `75268574`
+
+提取 base URL 的方式：取 `/pages/` 或 `/rest/` 之前的部分作为 base URL。
 
 ### Step 2: Load Credentials
 
 优先使用 shell 环境变量，若未设置则从 `.env.local` 加载：
 
 ```bash
-if [ -z "$CONFLUENCE_USER" ] || [ -z "$CONFLUENCE_PASS" ] || [ -z "$CONFLUENCE_BASE_URL" ]; then
+if [ -z "$CONFLUENCE_USER" ] || [ -z "$CONFLUENCE_PASS" ]; then
   set -a && source .env.local 2>/dev/null && set +a
 fi
 ```
 
 ### Step 3: Fetch Page
 
+用从链接中提取的 base URL 拼接 API 地址：
+
 ```bash
 curl -s -u "$CONFLUENCE_USER:$CONFLUENCE_PASS" \
-  "$CONFLUENCE_BASE_URL/rest/api/content/{pageId}?expand=body.storage,title" \
+  "{baseUrl}/rest/api/content/{pageId}?expand=body.storage,title" \
   | python3 -c "import sys,json; d=json.load(sys.stdin); print('TITLE:', d['title']); print('BODY:', d['body']['storage']['value'])"
 ```
 
