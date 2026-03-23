@@ -1,0 +1,10 @@
+{
+    "name": "jb",
+    "description": "Read Jira issues and Confluence pages via REST API with Basic Auth",
+    "version": "1.0.0",
+    "author": {
+        "name": "jackPanyj"
+    },
+    "repository": "https://github.com/jackPanyj/claude-plugins",
+    "license": "MIT"
+}
