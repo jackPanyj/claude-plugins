@@ -6,9 +6,8 @@
     "plugins": [
         {
             "name": "jb",
-            "source": ".",
-            "description": "Read Jira issues and Confluence pages via REST API with Basic Auth",
-            "version": "1.0.0"
+            "source": "./",
+            "description": "Read Jira issues and Confluence pages via REST API with Basic Auth"
         }
     ]
 }
