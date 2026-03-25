@@ -5,7 +5,11 @@
 ## 安装
 
 ```bash
-/plugin install jb -- source github jackPanyj/claude-plugins
+# 1. 添加 marketplace
+/plugin marketplace add jackPanyj/claude-plugins
+
+# 2. 安装插件
+/plugin install jb@jackPanyj-plugins
 ```
 
 ## Skills
