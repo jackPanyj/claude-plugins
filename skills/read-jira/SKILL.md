@@ -17,8 +17,6 @@ description: Use when user provides a Jira link or issue key (e.g. H5-XXXXX) and
 
 ## Prerequisites
 
-只需配置账号密码，不需要配置 Jira 地址（从用户提供的链接中自动提取）。
-
 支持以下方式（按优先级）：
 
 1. **Shell 环境变量**（如在 `.zshrc` 中 export）
@@ -27,20 +25,25 @@ description: Use when user provides a Jira link or issue key (e.g. H5-XXXXX) and
 ```
 JIRA_USER=your_username
 JIRA_PASS=your_password
+JIRA_BASE_URL=http://jira.example.com:8080   # optional, 如未配置则从用户提供的链接中提取
 ```
 
 ## Workflow
 
 ### Step 1: Extract Issue Key and Base URL
 
-从用户输入中提取 issue key 和 base URL：
+**Base URL 获取优先级**：
+
+1. 环境变量 / `.env.local` 中的 `JIRA_BASE_URL`
+2. 从用户提供的 URL 中提取（取 `/browse/` 之前的部分）
+3. 若用户只提供了 issue key 且无 `JIRA_BASE_URL`，则需要用户补充完整链接
+
+示例：
 
 - URL: `http://jira.example.com:8080/browse/H5-13209`
-  - base URL → `http://jira.example.com:8080`
+  - base URL → `http://jira.example.com:8080`（若未配置 `JIRA_BASE_URL`）
   - issue key → `H5-13209`
-- 直接提供 issue key（如 `H5-13209`）：需要用户补充完整链接，或使用上次使用过的 base URL
-
-提取 base URL 的方式：取 `/browse/` 之前的部分作为 base URL。
+- 直接提供 issue key（如 `H5-13209`）：使用 `JIRA_BASE_URL` 拼接，若未配置则要求用户提供完整链接
 
 ### Step 2: Load Credentials
 
@@ -51,6 +54,8 @@ if [ -z "$JIRA_USER" ] || [ -z "$JIRA_PASS" ]; then
   set -a && source .env.local 2>/dev/null && set +a
 fi
 ```
+
+如果配置了 `JIRA_BASE_URL`，优先使用它作为 base URL，否则从用户提供的链接中提取。
 
 ### Step 3: Fetch Issue
 

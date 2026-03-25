@@ -16,8 +16,6 @@ description: Use when user provides a Confluence link and wants to read API docs
 
 ## Prerequisites
 
-只需配置账号密码，不需要配置 Confluence 地址（从用户提供的链接中自动提取）。
-
 支持以下方式（按优先级）：
 
 1. **Shell 环境变量**（如在 `.zshrc` 中 export）
@@ -26,19 +24,25 @@ description: Use when user provides a Confluence link and wants to read API docs
 ```
 CONFLUENCE_USER=your_username
 CONFLUENCE_PASS=your_password
+CONFLUENCE_BASE_URL=http://confluence.example.com:8090   # optional, 如未配置则从用户提供的链接中提取
 ```
 
 ## Workflow
 
 ### Step 1: Extract Page ID and Base URL
 
-从用户提供的 URL 中提取 pageId 和 base URL：
+**Base URL 获取优先级**：
+
+1. 环境变量 / `.env.local` 中的 `CONFLUENCE_BASE_URL`
+2. 从用户提供的 URL 中提取（取 `/pages/` 或 `/rest/` 之前的部分）
+3. 若用户只提供了 pageId 且无 `CONFLUENCE_BASE_URL`，则需要用户补充完整链接
+
+示例：
 
 - URL: `http://confluence.example.com:8090/pages/viewpage.action?pageId=75268574`
-  - base URL → `http://confluence.example.com:8090`
+  - base URL → `http://confluence.example.com:8090`（若未配置 `CONFLUENCE_BASE_URL`）
   - pageId → `75268574`
-
-提取 base URL 的方式：取 `/pages/` 或 `/rest/` 之前的部分作为 base URL。
+- 直接提供 pageId：使用 `CONFLUENCE_BASE_URL` 拼接，若未配置则要求用户提供完整链接
 
 ### Step 2: Load Credentials
 
@@ -49,6 +53,8 @@ if [ -z "$CONFLUENCE_USER" ] || [ -z "$CONFLUENCE_PASS" ]; then
   set -a && source .env.local 2>/dev/null && set +a
 fi
 ```
+
+如果配置了 `CONFLUENCE_BASE_URL`，优先使用它作为 base URL，否则从用户提供的链接中提取。
 
 ### Step 3: Fetch Page
 
