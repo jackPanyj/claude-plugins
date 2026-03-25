@@ -16,8 +16,8 @@
 
 | 命令 | 说明 |
 |------|------|
-| `/jb:read-jira` | 读取 Jira issue 详情、评论、附件 |
-| `/jb:read-confluence` | 读取 Confluence 页面内容，解析 API 文档 |
+| `/read-jira` | 读取 Jira issue 详情、评论、附件 |
+| `/read-confluence` | 读取 Confluence 页面内容，解析 API 文档 |
 
 ## 配置
 
